@@ -1,0 +1,194 @@
+Please note:
+Read carefully the questions. Each word is important.
+Feel free to add comments in your answers and read the documentation as you see fit.
+Don't forget to mention the language you are using.
+Do test your code!
+Between parenthesis is the weigh of each question, the maximum score is 20
+
+
+Test 1: Any Language (3 pts)
+Write an iterative function that takes a list of strings and returns the sum of the list items that represent an integer (skipping the other items).            
+
+#!/bin/python3
+
+def add_integers(list_of_strings):
+    result = 0
+    for string in list_of_strings:
+        try:
+            float_ = float(string)
+        except ValueError:
+            continue
+        if float_.is_integer():
+            result = result+int(float_)
+    return result
+
+Test 2: Any Language (3 pts)
+Solve the game "Guess a number", find a secret integer between 1 and 1000000
+in less than 50 guesses. Write a function that solves the game without user input and returns the
+solution by using the function verify() which is defined with the following specifications: 
+function verify(guess: integer) -> integer
+Argument:
+guess (integer): the number to verify
+Returns:
+0 if the guess is the solution, your program won
+-1 if the solution is smaller than the guess parameter
+1  if the solution is bigger than the guess parameter
+Warning: You are not allowed to call verify() more that 50 times or you lose.
+
+#!/bin/python3
+
+MAX_NUMBER = 1000000
+MAX_LOOPS = 50
+
+def guess_the_number(guess, last_low=0, last_high=MAX_NUMBER, loops=1):
+    if loops > MAX_LOOPS:
+        raise Exception("You've had more than "+str(MAX_LOOPS)+" guesses!")
+    if verify(guess) == 0:
+        return guess
+    elif verify(guess) == -1:
+        last_low = guess
+    elif verify(guess) == 1:
+        last_high = guess
+    guess = int((last_low+last_high)/2)
+    return guess_the_number(guess, last_low, last_high, loops+1)
+
+Test 3: Any Language (3 pts)
+Write a program that outputs sequentially the integers from 1 to 99, but on some conditions prints a string instead:
+when the integer is a multiple of 3 print “Open” instead of the number,
+when it is a multiple of 7 print “Source” instead of the number,
+when it is a multiple of both 3 and 7 print “OpenSource” instead of the number.
+
+#!/bin/python3
+
+OPEN_DIVISOR = 3
+SOURCE_DIVISOR = 7
+OPENSOURCE_DIVISOR = OPEN_DIVISOR*SOURCE_DIVISOR
+DEFAULT_MAX_INTEGER = 99
+
+def opensource(max_integer=DEFAULT_MAX_INTEGER):
+    for integer in range(1, DEFAULT_MAX_INTEGER+1):
+        if integer%OPENSOURCE_DIVISOR == 0:
+            print("OpenSource")
+        elif integer%OPEN_DIVISOR == 0:
+            print("Open")
+        elif integer%SOURCE_DIVISOR == 0:
+            print("Source")
+        else:
+            print(integer)
+
+Test 4: Any Language (1 pts)
+Write a recursive function that takes a list of strings and returns the sum of the list items that represent an integer (skipping the other items).            
+
+#!/bin/python3
+
+def add_integers_recursively(list_of_strings, result=0, index=0):
+    string = list_of_strings[index]
+    try:
+        float_ = float(string)
+    except ValueError:
+        pass
+    else:
+        if float_.is_integer():
+            result = result+int(float_)
+    if index == len(list_of_strings)-1:
+        return result
+    return add_integers_recursively(list_of_strings, result, index+1)
+
+Test 5: SQL (3 pts)
+Write pseudo-SQL statements to create database tables to store the products of a basic webshop. Each product has a name, a price, a creation date and may belong to several categories. Categories have a name and a flag to indicate whether the category is private or public.
+Write a SQL query to find the list of products that belong to more than 5 public categories.
+
+-- I'm writing my solution in SQLite, because that's the implementation with which I'm most familiar, but I've had some contact with plenty of others. SQLite doesn't have DATE or currency data types - otherwise I would have used them.
+
+-- This code creates the necessary tables:
+
+CREATE TABLE Product (
+    code TEXT,
+    name TEXT NOT NULL,
+    price INTEGER NOT NULL,
+    creation_date INTEGER NOT NULL,
+    PRIMARY KEY(code)
+);
+
+CREATE TABLE Category (
+    code TEXT,
+    name TEXT NOT NULL,
+    public INTEGER DEFAULT 0,
+    PRIMARY KEY(code)
+);
+
+CREATE TABLE BelongsToCategory (
+    product_code TEXT,
+    category_code TEXT,
+    PRIMARY KEY(product_code, category_code),
+    FOREIGN KEY(product_code) REFERENCES Product(code),
+    FOREIGN KEY(category_code) REFERENCES Category(code)
+);
+
+-- This code contains the desired query:
+
+SELECT *
+FROM Product
+WHERE
+    (SELECT COUNT(*)
+     FROM BelongsToCategory
+         JOIN Category ON Category.code = BelongsToCategory.category_code
+         WHERE (BelongsToCategory.product_code = Product.code) AND (Category.public = 1))
+         >= 5
+
+Test 6: Any Language (1 pts)
+Write a program to download the contents of https://www.sap.com/belgique/index.html (the SAP homepage for Belgium), and then save the contents of the page to a new local file, with all occurrences of "SAP" replaced by "Odoo".            
+
+import urllib.request
+
+DEFAULT_URL = "https://www.sap.com/belgique/index.html"
+
+def read_replace_save(url):
+    fp = urllib.request.urlopen(url)
+    my_bytes = fp.read()
+    my_str = my_bytes.decode("utf8")
+    fp.close()
+    new_str = my_str.replace("SAP", "Odoo")
+    with open("odoo.html", "w") as html_file:
+        html_file.write(new_str)
+
+read_replace_save(DEFAULT_URL)
+
+Test 7: Any Language (2 pts)
+You have a huge file named "data.bin" that does not fit in memory; code a program that deletes every 7th byte of it.
+truncate can be used to change its size.
+
+Apologies, but this kind of large-scale data management isn't something that I've done yet in my career. I'd love to learn how though!
+
+Test 8: Regular Expression (2 pts)
+Write a regular expression to match strings containing both "Odoo" and "#rules" in any order.            
+
+/Odoo.*#rules|#rules.*Odoo/
+
+Test 9: JavaScript (1 pts)
+Write a function that, when called, returns an array for which each element is a letter of the alphabet, from "A" to "Z" (exactly once, in order and upper case). Your code cannot contain the character ' (quote), " (double quote) or ` (back quote).            
+
+ASCII_CODE_FOR_CAPITAL_A = 65
+LETTERS_IN_THE_ALPHABET = 26
+
+function getArrayOfCapitalLetters()
+{
+    let result = [];
+    let code, character;
+
+    for(let i = 0; i < LETTERS_IN_THE_ALPHABET; i++)
+    {
+        code = ASCII_CODE_FOR_CAPITAL_A+i;
+        character = String.fromCharCode(code);
+        result.push(character);
+    }
+
+    return result;
+}
+
+console.log(getArrayOfCapitalLetters());
+
+Test 10: UNIX (1 pts)
+Write a C program that roughly measures the overhead of a mode switch between the kernel and userspace on a UNIX/Linux system (without using the pthread API). Please indicate the assumptions your rough estimation is based on.            
+
+Again, I can only offer my apologies. I'm a passionate advocate for Linux; however, I've not yet had the chance to get into the fine details of the operating system.
